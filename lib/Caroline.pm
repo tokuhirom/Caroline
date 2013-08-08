@@ -157,7 +157,24 @@ sub edit {
             $self->edit_history_next($state, $HISTORY_NEXT);
         } elsif ($cc == 27) { # escape sequence
             # Read the next two bytes representing the escape sequence
-            ...
+            CORE::read(*STDIN, my $buf, 2)==2 or return undef;
+            if ($buf eq "[D") { # left arrow
+                $self->edit_move_left($state);
+            } elsif ($buf eq "[C") { # right arrow
+                $self->edit_move_right($state);
+            } elsif ($buf eq "[A") { # up arrow
+                $self->edit_history_next($state, $HISTORY_PREV);
+            } elsif ($buf eq "[B") { # down arrow
+                $self->edit_history_next($state, $HISTORY_NEXT);
+            }
+#           else if (seq[0] == 91 && seq[1] > 48 && seq[1] < 55) {
+#               /* extended escape, read additional two bytes. */
+#               if (read(fd,seq2,2) == -1) break;
+#               if (seq[1] == 51 && seq2[0] == 126) {
+#                   /* Delete key. */
+#                   linenoiseEditDelete(&l);
+#               }
+#           }
         } elsif ($cc == 21) { # ctrl-u
             # delete the whole line.
             $state->{buf} = '';
@@ -176,12 +193,27 @@ sub edit {
             $self->clear_screen();
             $self->refresh_line($state);
         } elsif ($cc == 23) { # ctrl-w
-            ...
+            $self->edit_delete_prev_word($state);
         } else {
             $self->edit_insert($state, $c);
         }
     }
     return $state->buf;
+}
+
+sub edit_delete_prev_word {
+    my ($self, $state) = @_;
+
+    my $old_pos = $state->pos;
+    while ($state->pos > 0 && substr($state->buf, $state->pos-1, 1) eq ' ') {
+        $state->{pos}--;
+    }
+    while ($state->pos > 0 && substr($state->buf, $state->pos-1, 1) ne ' ') {
+        $state->{pos}--;
+    }
+    my $diff = $old_pos - $state->pos;
+    substr($state->{buf}, $state->pos, $diff) = '';
+    $self->refresh_line($state);
 }
 
 sub edit_history_next {
