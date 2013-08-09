@@ -30,6 +30,7 @@ my $c = Caroline->new(
         }
         return;
     },
+    history_max_len => 3,
 );
 while (defined(my $line = $c->readline('hello> '))) {
     if ($line =~ /\S/) {

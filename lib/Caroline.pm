@@ -15,7 +15,7 @@ my $HISTORY_NEXT = 0;
 my $HISTORY_PREV = 1;
 
 use Class::Accessor::Lite 0.05 (
-    rw => [qw(completion_callback)],
+    rw => [qw(completion_callback history_max_len)],
 );
 
 sub new {
@@ -25,6 +25,7 @@ sub new {
         history => [],
         debug => !!$ENV{CAROLINE_DEBUG},
         multi_line => 1,
+        history_max_len => 100,
         %args
     }, $class;
     return $self;
@@ -127,6 +128,9 @@ sub disable_raw_mode {
 
 sub history_add {
     my ($self, $line) = @_;
+    if (@{$self->{history}}+1 > $self->history_max_len) {
+        shift @{$self->{history}};
+    }
     push @{$self->{history}}, $line;
 }
 
@@ -578,9 +582,9 @@ Options are:
 
 =over 4
 
-=item history : ArrayRef[Str]
+=item history_max_len : Str
 
-You can pass the older history data for constructor.
+Set the limitation for max history size.
 
 =item completion_callback : CodeRef
 
@@ -610,6 +614,10 @@ You can write completion callback function like this:
 Read line with C<$prompt>.
 
 Trailing newline is removed. Returns undef on EOF.
+
+=item $caroline->history_add($line)
+
+Add $line to the history.
 
 =item $caroline->history()
 
