@@ -7,6 +7,8 @@ use Storable;
 use Text::VisualWidth::PP 0.02;
 use Term::ReadKey qw(GetTerminalSize);
 
+sub vwidth { Text::VisualWidth::PP::width(@_) }
+
 our $VERSION = "0.01";
 
 our @EXPORT = qw( caroline );
@@ -348,13 +350,29 @@ sub refresh_multi_line {
 
 sub refresh_single_line {
     my ($self, $state) = @_;
+
+    my $buf = $state->buf;
+    my $len = $state->len;
+    my $pos = $state->pos;
+    while ((vwidth($state->prompt)+$pos) >= $state->cols) {
+        substr($buf, 0, 1) = '';
+        $len--;
+        $pos--;
+    }
+    while (vwidth($state->prompt) + vwidth($buf) > $state->cols) {
+        $len--;
+    }
+
     print STDOUT "\x1b[0G"; # cursor to left edge
     print STDOUT $state->{prompt};
-    print STDOUT $state->buf;
+    print STDOUT $buf;
     print STDOUT "\x1b[0K"; # erase to right
 
     # Move cursor to original position
-    printf "\x1b[0G\x1b[%dC", $state->cursor_pos;
+    printf "\x1b[0G\x1b[%dC", (
+        length($state->{prompt})
+        + Text::VisualWidth::PP::width(substr($buf, 0, $pos))
+    );
 }
 
 sub edit_move_right {
@@ -379,10 +397,10 @@ sub edit_insert {
     if (length($state->buf) == $state->pos) {
         $state->{buf} .= $c;
         $state->{pos}++;
-        if (not $self->{multi_line}) {
+        if (!$self->{multi_line} && $state->width < $state->cols) {
+            # Avoid a full update of the line in the trivial case
             print STDOUT $c;
             STDOUT->flush;
-         #  $self->refresh_line($state);
         } else {
             $self->refresh_line($state);
         }
@@ -401,7 +419,7 @@ sub is_supported {
 package Caroline::State;
 
 use Class::Accessor::Lite 0.05 (
-    rw => [qw(buf pos cols)],
+    rw => [qw(buf pos cols prompt)],
 );
 
 sub new {
@@ -415,13 +433,11 @@ sub new {
 use Text::VisualWidth::PP;
 
 sub len { length(shift->buf) }
+sub plen { length(shift->prompt) }
 
-sub cursor_pos {
+sub width {
     my $self = shift;
-    return (
-        length($self->{prompt})
-        + Text::VisualWidth::PP::width(substr($self->buf, 0, $self->pos))
-    );
+    Text::VisualWidth::PP::width($self->prompt . $self->buf);
 }
 
 1;
