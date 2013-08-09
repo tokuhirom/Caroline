@@ -4,10 +4,8 @@ use strict;
 use warnings;
 use POSIX qw(termios_h);
 use Storable;
-use Text::VisualWidth::PP 0.02;
+use Text::VisualWidth::PP 0.03 qw(vwidth);
 use Term::ReadKey qw(GetTerminalSize);
-
-sub vwidth { Text::VisualWidth::PP::width(@_) }
 
 our $VERSION = "0.01";
 
@@ -22,6 +20,7 @@ sub new {
     my $self = bless {
         history => [],
         debug => !!$ENV{CAROLINE_DEBUG},
+        multi_line => 0,
         %args
     }, $class;
     return $self;
@@ -31,9 +30,10 @@ sub debug {
     my ($self, $stuff) = @_;
     return unless $self->{debug};
 
-    require JSON::PP;
+#   require JSON::PP;
     open my $fh, '>>:utf8', 'caroline.debug.log';
-    print $fh JSON::PP->new->allow_nonref(1)->encode($stuff) . "\n";
+    print $fh $stuff;
+#   print $fh JSON::PP->new->allow_nonref(1)->encode($stuff) . "\n";
     close $fh;
 }
 
@@ -135,6 +135,7 @@ sub edit {
     my $state = Caroline::State->new;
     $state->{prompt} = $prompt;
     $state->cols($self->get_columns);
+    $self->debug("Columns: $state->{cols}\n");
 
     while (1) {
         my $c;
@@ -345,7 +346,73 @@ sub refresh_line {
 
 sub refresh_multi_line {
     my ($self, $state) = @_;
-    die "Not implemented yet.";
+
+    my $plen = vwidth($state->prompt);
+
+    # rows used by current buf
+    my $rows = int(($plen + vwidth($state->buf) + $state->cols -1) / $state->cols);
+    # cursor relative row
+    my $rpos = int(($plen + $state->oldpos + $state->cols) / $state->cols);
+
+    my $old_rows = $state->maxrows;
+
+    # update maxrows if needed.
+    if ($rows > $state->maxrows) {
+        $state->maxrows($rows);
+    }
+
+    $self->debug(sprintf "[%d %d %d] p: %d, rows: %d, rpos: %d, max: %d, oldmax: %d",
+                $state->len, $state->pos, $state->oldpos, $plen, $rows, $rpos, $state->maxrows, $old_rows);
+
+    # First step: clear all the lines used before. To do start by going to the last row.
+    if ($old_rows - $rpos > 0) {
+        $self->debug(sprintf ", go down %d", $old_rows-$rpos);
+        printf STDOUT "\x1b[%dB", $old_rows-$rpos;
+    }
+
+    # Now for every row clear it, go up.
+    my $j;
+    for ($j=0; $j < ($old_rows-1); ++$j) {
+        $self->debug(sprintf ", clear+up %d %d", $old_rows-1, $j);
+        print("\x1b[0G\x1b[0K\x1b[1A");
+    }
+
+    # Clean the top line
+    $self->debug(", clear");
+    print("\x1b[0G\x1b[0K");
+
+    # Write the prompt and the current buffer content
+    print $state->prompt;
+    print $state->buf;
+
+    # If we are at the very end of the screen with our prompt, we need to
+    # emit a newline and move the prompt to the first column
+    if ($state->pos && $state->pos == $state->len && ($state->pos + $plen) % $state->cols == 0) {
+        $self->debug("<newline>");
+        print "\n";
+        print "\x1b[0G";
+        $rows++;
+        if ($rows > $state->maxrows) {
+            $state->maxrows(int $rows);
+        }
+    }
+
+    # Move cursor to right position
+    my $rpos2 = int(($plen + $state->vpos + $state->cols) / $state->cols); # current cursor relative row
+    $self->debug(sprintf ", rpos2 %d", $rpos2);
+    # Go up till we reach the expected position
+    if ($rows - $rpos2 > 0) {
+        # cursor up
+        printf "\x1b[%dA", $rows-$rpos2;
+    }
+
+    # Set column
+    $self->debug(sprintf ", set col %d", 1+(($plen + $state->vpos) % $state->cols));
+    printf "\x1b[%dG", 1+(($plen + $state->vpos) % $state->cols);
+
+    $state->oldpos($state->pos);
+
+    $self->debug("\n");
 }
 
 sub refresh_single_line {
@@ -371,7 +438,7 @@ sub refresh_single_line {
     # Move cursor to original position
     printf "\x1b[0G\x1b[%dC", (
         length($state->{prompt})
-        + Text::VisualWidth::PP::width(substr($buf, 0, $pos))
+        + vwidth(substr($buf, 0, $pos))
     );
 }
 
@@ -419,7 +486,7 @@ sub is_supported {
 package Caroline::State;
 
 use Class::Accessor::Lite 0.05 (
-    rw => [qw(buf pos cols prompt)],
+    rw => [qw(buf pos cols prompt oldpos maxrows)],
 );
 
 sub new {
@@ -428,16 +495,23 @@ sub new {
         buf => '',
         pos => 0,
         history_index => 0,
+        oldpos => 0,
+        maxrows => 0,
     }, $class;
 }
-use Text::VisualWidth::PP;
+use Text::VisualWidth::PP 0.03 qw(vwidth);
 
 sub len { length(shift->buf) }
 sub plen { length(shift->prompt) }
 
+sub vpos {
+    my $self = shift;
+    vwidth(substr($self->buf, 0, $self->pos));
+}
+
 sub width {
     my $self = shift;
-    Text::VisualWidth::PP::width($self->prompt . $self->buf);
+    vwidth($self->prompt . $self->buf);
 }
 
 1;
@@ -546,8 +620,6 @@ it under the same terms as Perl itself.
 =head1 TODO
 
 =over 4
-
-=item Multi line mode
 
 =item Win32 Support
 

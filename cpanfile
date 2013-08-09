@@ -1,7 +1,7 @@
 requires 'perl', '5.008001';
 requires 'Storable';
 requires 'POSIX';
-requires 'Text::VisualWidth::PP', 0.02;
+requires 'Text::VisualWidth::PP', 0.03;
 requires 'Class::Accessor::Lite', 0.05;
 
 on 'test' => sub {
