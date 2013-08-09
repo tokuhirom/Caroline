@@ -2,6 +2,11 @@ Revision history for Perl extension Caroline
 
 {{$NEXT}}
 
+0.02 2013-08-09T11:23:45Z
+
+    - Use Term::ReadKey to support MSWin32
+      (suggested by mattn++)
+
 0.01 2013-08-09T08:45:23Z
 
     - original version
