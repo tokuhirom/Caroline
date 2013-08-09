@@ -5,7 +5,7 @@ use warnings;
 use POSIX qw(termios_h);
 use Storable;
 use Text::VisualWidth::PP 0.03 qw(vwidth);
-use Term::ReadKey qw(GetTerminalSize ReadLine);
+use Term::ReadKey qw(GetTerminalSize ReadLine ReadKey ReadMode);
 
 our $VERSION = "0.03";
 
@@ -13,6 +13,9 @@ our @EXPORT = qw( caroline );
 
 my $HISTORY_NEXT = 0;
 my $HISTORY_PREV = 1;
+
+my $IS_WIN32 = $^O eq 'MSWin32';
+require Win32::Console::ANSI if $IS_WIN32;
 
 use Class::Accessor::Lite 0.05 (
     rw => [qw(completion_callback history_max_len)],
@@ -97,6 +100,10 @@ sub read_raw {
 sub enable_raw_mode {
     my $self = shift;
 
+    if ($IS_WIN32) {
+        ReadMode(5);
+        return undef;
+    }
     my $termios = POSIX::Termios->new;
     $termios->getattr(0);
     $self->{rawmode} = [$termios->getiflag, $termios->getoflag, $termios->getcflag, $termios->getlflag, $termios->getcc(VMIN), $termios->getcc(VTIME)];
@@ -112,6 +119,11 @@ sub enable_raw_mode {
 
 sub disable_raw_mode {
     my $self = shift;
+
+    if ($IS_WIN32) {
+        ReadMode(0);
+        return undef;
+    }
     if (my $r = delete $self->{rawmode}) {
         my $termios = POSIX::Termios->new;
         $termios->getattr(0);
@@ -147,10 +159,7 @@ sub edit {
     $self->debug("Columns: $state->{cols}\n");
 
     while (1) {
-        my $c;
-        if (CORE::read(STDIN, $c, 1) <= 0) {
-            return $state->buf;
-        }
+        my $c = ReadKey(0) or return $state->buf;
         my $cc = ord($c);
 
         if ($cc == 9 && defined $self->{completion_callback}) {
@@ -268,7 +277,7 @@ sub complete_line {
             $self->refresh_line($state);
         }
 
-        CORE::read(*STDIN, my $c, 1) ==1 or return undef;
+        my $c = ReadKey(0) or return undef;
         my $cc = ord($c);
         if ($cc == 9) { # tab
             $i = ($i+1) % (1+@ret);
@@ -496,6 +505,7 @@ sub edit_insert {
 
 sub is_supported {
     my ($self) = @_;
+    return 1 if $IS_WIN32;
     my $term = $ENV{'TERM'};
     return 0 unless defined $term;
     return 0 if $term eq 'dumb';
