@@ -1,5 +1,5 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "Yet another line editing library ",
    "author" : [
       "tokuhirom <tokuhirom@gmail.com>"
    ],
@@ -42,6 +42,9 @@
       },
       "runtime" : {
          "requires" : {
+            "POSIX" : "0",
+            "Storable" : "0",
+            "Text::VisualWidth::PP" : "0.02",
             "perl" : "5.008005"
          }
       },

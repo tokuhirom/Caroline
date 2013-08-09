@@ -3,7 +3,8 @@ use 5.008005;
 use strict;
 use warnings;
 use POSIX qw(termios_h);
-use Scope::Guard;
+use Storable;
+use Text::VisualWidth::PP 0.02;
 
 our $VERSION = "0.01";
 
@@ -17,9 +18,20 @@ sub new {
     my %args = @_==1? %{$_[0]} : @_;
     my $self = bless {
         history => [],
+        debug => !!$ENV{CAROLINE_DEBUG},
         %args
     }, $class;
     return $self;
+}
+
+sub debug {
+    my ($self, $stuff) = @_;
+    return unless $self->{debug};
+
+    require JSON::PP;
+    open my $fh, '>>:utf8', 'caroline.debug.log';
+    print $fh JSON::PP->new->allow_nonref(1)->encode($stuff) . "\n";
+    close $fh;
 }
 
 sub history { shift->{history} }
@@ -34,10 +46,12 @@ sub DESTROY {
     $self->disable_raw_mode();
 }
 
-sub read {
+sub read :method {
     my ($self, $prompt) = @_;
     $prompt = '> ' unless defined $prompt;
     STDOUT->autoflush(1);
+
+    local $Text::VisualWidth::PP::EastAsian = 1;
 
     if ($self->is_supported && -t STDIN) {
         return $self->read_raw($prompt);
@@ -114,13 +128,16 @@ sub edit {
 
     while (1) {
         my $c;
-        if (sysread(STDIN, $c, 1) <= 0) {
+        if (CORE::read(STDIN, $c, 1) <= 0) {
             return $state->buf;
         }
         my $cc = ord($c);
 
         if ($cc == 9 && defined $self->{completion_callback}) {
-            ...
+            $c = $self->complete_line($state);
+            return undef unless defined $c;
+            $cc = ord($c);
+            next if $cc == 0;
         }
 
         if ($cc == 13) { # enter
@@ -201,6 +218,56 @@ sub edit {
     return $state->buf;
 }
 
+sub complete_line {
+    my ($self, $state) = @_;
+
+    my @ret = grep { defined $_ } $self->{completion_callback}->($state->buf);
+    unless (@ret) {
+        $self->beep;
+        return "\0";
+    }
+
+    my $i = 0;
+    while (1) {
+        # Show completion or original buffer
+        if ($i < @ret) {
+            my $cloned = Storable::dclone($state);
+            $cloned->{buf} = $ret[$i];
+            $cloned->{pos} = length($cloned->{buf});
+            $self->refresh_line($cloned);
+        } else {
+            $self->refresh_line($state);
+        }
+
+        CORE::read(*STDIN, my $c, 1) ==1 or return undef;
+        my $cc = ord($c);
+        if ($cc == 9) { # tab
+            $i = ($i+1) % (1+@ret);
+            if ($i==@ret) {
+                $self->beep();
+            }
+        } elsif ($cc == 27) { # escape
+            # Re-show original buffer
+            if ($i<@ret) {
+                $self->refresh_line($state);
+            }
+            return $c;
+        } else {
+            # Update buffer and return
+            if ($i<@ret) {
+                $state->{buf} = $ret[$i];
+                $state->{pos} = length($state->{buf});
+            }
+            return $c;
+        }
+    }
+}
+
+sub beep {
+    print STDERR "\x7";
+    STDERR->flush;
+}
+
 sub edit_delete_prev_word {
     my ($self, $state) = @_;
 
@@ -251,8 +318,8 @@ sub clear_screen {
 sub refresh_line {
     my ($self, $state) = @_;
     if ($self->{mlmode}) {
+        die "Not implemented yet.";
         $self->refresh_multi_line($state);
-        ...
     } else {
         $self->refresh_single_line($state);
     }
@@ -266,7 +333,7 @@ sub refresh_single_line {
     print STDOUT "\x1b[0K"; # erase to right
 
     # Move cursor to original position
-    printf "\x1b[0G\x1b[%dC", length($state->{prompt}) + $state->{pos};
+    printf "\x1b[0G\x1b[%dC", $state->cursor_pos;
 }
 
 sub edit_move_right {
@@ -324,18 +391,28 @@ sub new {
         history_index => 0,
     }, $class;
 }
+use Text::VisualWidth::PP;
 
 sub len { length(shift->buf) }
 
+sub cursor_pos {
+    my $self = shift;
+    return (
+        length($self->{prompt})
+        + Text::VisualWidth::PP::width(substr($self->buf, 0, $self->pos))
+    );
+}
 
 1;
 __END__
+
+=for stopwords binmode
 
 =encoding utf-8
 
 =head1 NAME
 
-Caroline - It's new $module
+Caroline - Yet another line editing library 
 
 =head1 SYNOPSIS
 
@@ -350,7 +427,26 @@ Caroline - It's new $module
 
 =head1 DESCRIPTION
 
-Caroline is ...
+Caroline is yet another line editing library like L<Term::ReadLine::Gnu>.
+
+This module supports
+
+=over 4
+
+=item History handling
+
+=item Complition
+
+=back
+
+=head1 Multi byte character support
+
+If you want to support multi byte characters, you need to set binmode to STDIN.
+You can add the following code before call Caroline.
+
+    use Term::Encoding qw(term_encoding);
+    my $encoding = term_encoding();
+    binmode *STDIN, ":encoding(${encoding})";
 
 =head1 LICENSE
 
@@ -362,6 +458,8 @@ it under the same terms as Perl itself.
 =head1 TODO
 
 =over 4
+
+=item Multi line mode
 
 =item Win32 Support
 
