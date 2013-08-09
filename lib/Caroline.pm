@@ -20,7 +20,7 @@ sub new {
     my $self = bless {
         history => [],
         debug => !!$ENV{CAROLINE_DEBUG},
-        multi_line => 0,
+        multi_line => 1,
         %args
     }, $class;
     return $self;
