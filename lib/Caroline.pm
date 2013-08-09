@@ -14,6 +14,10 @@ our @EXPORT = qw( caroline );
 my $HISTORY_NEXT = 0;
 my $HISTORY_PREV = 1;
 
+use Class::Accessor::Lite 0.05 (
+    rw => [qw(completion_callback)],
+);
+
 sub new {
     my $class = shift;
     my %args = @_==1? %{$_[0]} : @_;
