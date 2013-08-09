@@ -5,6 +5,7 @@ use warnings;
 use POSIX qw(termios_h);
 use Storable;
 use Text::VisualWidth::PP 0.02;
+use Term::ReadKey qw(GetTerminalSize);
 
 our $VERSION = "0.01";
 
@@ -62,6 +63,12 @@ sub readline {
         $line =~ s/\n$//;
         return $line;
     }
+}
+
+sub get_columns {
+    my $self = shift;
+    my ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
+    return $wchar;
 }
 
 # linenoiseRaw
@@ -125,6 +132,7 @@ sub edit {
 
     my $state = Caroline::State->new;
     $state->{prompt} = $prompt;
+    $state->cols($self->get_columns);
 
     while (1) {
         my $c;
@@ -184,6 +192,7 @@ sub edit {
             } elsif ($buf eq "[B") { # down arrow
                 $self->edit_history_next($state, $HISTORY_NEXT);
             }
+            # TODO:
 #           else if (seq[0] == 91 && seq[1] > 48 && seq[1] < 55) {
 #               /* extended escape, read additional two bytes. */
 #               if (read(fd,seq2,2) == -1) break;
@@ -392,7 +401,7 @@ sub is_supported {
 package Caroline::State;
 
 use Class::Accessor::Lite 0.05 (
-    rw => [qw(buf pos)],
+    rw => [qw(buf pos cols)],
 );
 
 sub new {
@@ -459,11 +468,25 @@ This module supports
 
 Create new Caroline instance.
 
+Options are:
+
+=over 4
+
+=item history : ArrayRef[Str]
+
+You can pass the older history data for constructor.
+
+=back
+
 =item my $line = $caroline->read($prompt);
 
 Read line with C<$prompt>.
 
 Trailing newline is removed. Returns undef on EOF.
+
+=item $caroline->history()
+
+Get the current history data in C< ArrayRef[Str] >.
 
 =back
 
