@@ -5,7 +5,7 @@ use warnings;
 use POSIX qw(termios_h);
 use Storable;
 use Text::VisualWidth::PP 0.03 qw(vwidth);
-use Term::ReadKey qw(GetTerminalSize);
+use Term::ReadKey qw(GetTerminalSize ReadLine);
 
 our $VERSION = "0.01";
 
@@ -65,8 +65,9 @@ sub readline {
     } else {
         print STDOUT $prompt;
         STDOUT->flush;
-        my $line = <STDIN>;
-        $line =~ s/\n$//;
+        # I need to use ReadLine() to support Win32.
+        my $line = ReadLine(0);
+        $line =~ s/\n$// if defined $line;
         return $line;
     }
 }
