@@ -218,6 +218,14 @@ sub edit {
     return $state->buf;
 }
 
+sub edit_delete {
+    my ($self, $status) = @_;
+    if ($status->len > 0 && $status->pos < $status->len) {
+        substr($status->{buf}, $status->pos, 1) = '';
+        $self->refresh_line($status);
+    }
+}
+
 sub complete_line {
     my ($self, $state) = @_;
 
@@ -359,9 +367,9 @@ sub edit_insert {
         $state->{buf} .= $c;
         $state->{pos}++;
         if (not $self->{mlmode}) {
-         #  print STDOUT $c;
-         #  STDOUT->flush;
-            $self->refresh_line($state);
+            print STDOUT $c;
+            STDOUT->flush;
+         #  $self->refresh_line($state);
         } else {
             $self->refresh_line($state);
         }
