@@ -23,6 +23,10 @@ my $c = Caroline->new(
                 'hello',
                 'hello there'
             );
+        } elsif ($line eq 'm') {
+            return (
+                '突然のmattn'
+            );
         }
         return;
     },
