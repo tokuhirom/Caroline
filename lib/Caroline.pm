@@ -46,7 +46,7 @@ sub DESTROY {
     $self->disable_raw_mode();
 }
 
-sub read :method {
+sub readline {
     my ($self, $prompt) = @_;
     $prompt = '> ' unless defined $prompt;
     STDOUT->autoflush(1);
@@ -427,7 +427,7 @@ Caroline - Yet another line editing library
     use Caroline;
 
     my $c = Caroline->new;
-    while (defined(my $line = $c->read('> ')) {
+    while (defined(my $line = $c->readline('> ')) {
         if ($line =~ /\S/) {
             print eval $line;
         }
@@ -444,6 +444,22 @@ This module supports
 =item History handling
 
 =item Complition
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item my $caroline = Caroline->new();
+
+Create new Caroline instance.
+
+=item my $line = $caroline->read($prompt);
+
+Read line with C<$prompt>.
+
+Trailing newline is removed. Returns undef on EOF.
 
 =back
 

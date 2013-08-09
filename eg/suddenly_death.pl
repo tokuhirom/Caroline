@@ -31,7 +31,7 @@ my $c = Caroline->new(
         return;
     },
 );
-while (defined(my $line = $c->read())) {
+while (defined(my $line = $c->readline())) {
     if ($line =~ /\S/) {
         print sudden_death($line), "\n";
         $c->history_add($line);
