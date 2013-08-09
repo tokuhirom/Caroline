@@ -407,8 +407,19 @@ sub refresh_multi_line {
     }
 
     # Set column
-    $self->debug(sprintf ", set col %d", 1+(($plen + $state->vpos) % $state->cols));
-    printf "\x1b[%dG", 1+(($plen + $state->vpos) % $state->cols);
+    my $col;
+    {
+        $col = 1;
+        my $buf = $state->prompt . substr($state->buf, 0, $state->pos);
+        for (split //, $buf) {
+            $col += vwidth($_);
+            if ($col > $state->cols) {
+                $col -= $state->cols;
+            }
+        }
+    }
+    $self->debug(sprintf ", set col %d", $col);
+    printf "\x1b[%dG", $col;
 
     $state->oldpos($state->pos);
 
