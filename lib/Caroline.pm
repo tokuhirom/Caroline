@@ -476,6 +476,27 @@ Options are:
 
 You can pass the older history data for constructor.
 
+=item completion_callback : CodeRef
+
+You can write completion callback function like this:
+
+    my $c = Caroline->new(
+        completion_callback => sub {
+            my ($line) = @_;
+            if ($line eq 'h') {
+                return (
+                    'hello',
+                    'hello there'
+                );
+            } elsif ($line eq 'm') {
+                return (
+                    '突然のmattn'
+                );
+            }
+            return;
+        },
+    );
+
 =back
 
 =item my $line = $caroline->read($prompt);
