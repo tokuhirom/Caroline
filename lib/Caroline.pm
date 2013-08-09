@@ -325,12 +325,16 @@ sub clear_screen {
 
 sub refresh_line {
     my ($self, $state) = @_;
-    if ($self->{mlmode}) {
-        die "Not implemented yet.";
+    if ($self->{multi_line}) {
         $self->refresh_multi_line($state);
     } else {
         $self->refresh_single_line($state);
     }
+}
+
+sub refresh_multi_line {
+    my ($self, $state) = @_;
+    die "Not implemented yet.";
 }
 
 sub refresh_single_line {
@@ -366,7 +370,7 @@ sub edit_insert {
     if (length($state->buf) == $state->pos) {
         $state->{buf} .= $c;
         $state->{pos}++;
-        if (not $self->{mlmode}) {
+        if (not $self->{multi_line}) {
             print STDOUT $c;
             STDOUT->flush;
          #  $self->refresh_line($state);
