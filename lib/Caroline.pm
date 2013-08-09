@@ -202,6 +202,7 @@ sub edit {
         } elsif ($cc == 14) { # ctrl-n
             $self->edit_history_next($state, $HISTORY_NEXT);
         } elsif ($cc == 27) { # escape sequence
+            next if $IS_WIN32;
             # Read the next two bytes representing the escape sequence
             CORE::read(*STDIN, my $buf, 2)==2 or return undef;
             if ($buf eq "[D") { # left arrow
