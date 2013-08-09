@@ -7,7 +7,7 @@ use Storable;
 use Text::VisualWidth::PP 0.03 qw(vwidth);
 use Term::ReadKey qw(GetTerminalSize ReadLine);
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 our @EXPORT = qw( caroline );
 

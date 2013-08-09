@@ -30,9 +30,9 @@ This module supports
 
     Options are:
 
-    - history : ArrayRef\[Str\]
+    - history\_max\_len : Str
 
-        You can pass the older history data for constructor.
+        Set the limitation for max history size.
 
     - completion\_callback : CodeRef
 
@@ -60,6 +60,10 @@ This module supports
     Read line with `$prompt`.
 
     Trailing newline is removed. Returns undef on EOF.
+
+- $caroline->history\_add($line)
+
+    Add $line to the history.
 
 - $caroline->history()
 
