@@ -42,9 +42,11 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::Accessor::Lite" : "0.05",
             "POSIX" : "0",
             "Storable" : "0",
-            "Text::VisualWidth::PP" : "0.02",
+            "Term::ReadKey" : "2.3",
+            "Text::VisualWidth::PP" : "0.03",
             "perl" : "5.008005"
          }
       },
@@ -55,5 +57,16 @@
       }
    },
    "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Caroline/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Caroline",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tokuhirom/Caroline.git",
+         "web" : "https://github.com/tokuhirom/Caroline"
+      }
+   },
    "version" : "0.01"
 }

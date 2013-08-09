@@ -7,7 +7,7 @@ Caroline - Yet another line editing library
     use Caroline;
 
     my $c = Caroline->new;
-    while (defined(my $line = $c->read('> ')) {
+    while (defined(my $line = $c->readline('> ')) {
         if ($line =~ /\S/) {
             print eval $line;
         }
@@ -21,6 +21,49 @@ This module supports
 
 - History handling
 - Complition
+
+# METHODS
+
+- my $caroline = Caroline->new();
+
+    Create new Caroline instance.
+
+    Options are:
+
+    - history : ArrayRef\[Str\]
+
+        You can pass the older history data for constructor.
+
+    - completion\_callback : CodeRef
+
+        You can write completion callback function like this:
+
+            my $c = Caroline->new(
+                completion_callback => sub {
+                    my ($line) = @_;
+                    if ($line eq 'h') {
+                        return (
+                            'hello',
+                            'hello there'
+                        );
+                    } elsif ($line eq 'm') {
+                        return (
+                            '突然のmattn'
+                        );
+                    }
+                    return;
+                },
+            );
+
+- my $line = $caroline->read($prompt);
+
+    Read line with `$prompt`.
+
+    Trailing newline is removed. Returns undef on EOF.
+
+- $caroline->history()
+
+    Get the current history data in ` ArrayRef[Str] `.
 
 # Multi byte character support
 
@@ -40,7 +83,6 @@ it under the same terms as Perl itself.
 
 # TODO
 
-- Multi line mode
 - Win32 Support
 - Search with C-r
 
