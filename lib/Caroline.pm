@@ -269,6 +269,7 @@ sub edit {
         } elsif ($cc == CTRL_W) { # ctrl-w
             $self->edit_delete_prev_word($state);
         } else {
+            $self->debug("inserting $cc\n");
             $self->edit_insert($state, $c);
         }
     }
@@ -598,15 +599,11 @@ sub edit_insert {
     my ($self, $state, $c) = @_;
     if (length($state->buf) == $state->pos) {
         $state->{buf} .= $c;
-        $state->{pos}++;
-        if (!$self->{multi_line} && $state->width < $state->cols) {
-            # Avoid a full update of the line in the trivial case
-            print STDOUT $c;
-            STDOUT->flush;
-        } else {
-            $self->refresh_line($state);
-        }
+    } else {
+        substr($state->{buf}, $state->{pos}, 0) = $c;
     }
+    $state->{pos}++;
+    $self->refresh_line($state);
 }
 
 sub is_supported {
