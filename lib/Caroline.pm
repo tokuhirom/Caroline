@@ -655,7 +655,7 @@ Caroline - Yet another line editing library
     use Caroline;
 
     my $c = Caroline->new;
-    while (defined(my $line = $c->readline('> ')) {
+    while (defined(my $line = $c->readline('> '))) {
         if ($line =~ /\S/) {
             print eval $line;
         }
