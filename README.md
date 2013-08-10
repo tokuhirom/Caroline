@@ -44,6 +44,7 @@ Provides portable line editing library for Perl5 community.
 
         You can write completion callback function like this:
 
+            use Caroline;
             my $c = Caroline->new(
                 completion_callback => sub {
                     my ($line) = @_;
