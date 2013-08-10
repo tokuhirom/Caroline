@@ -2,6 +2,15 @@ Revision history for Perl extension Caroline
 
 {{$NEXT}}
 
+0.07 2013-08-10T22:57:02Z
+
+    - Fixed line editing issue
+      (tokuhirom)
+    - Show searching query while under the searching state
+      (tokuhirom)
+    - Example code fixes
+      (Ahmad M. Zawawi)
+
 0.06 2013-08-10T04:05:43Z
 
     - Do not create history file if maximum history length was limited to 0.
