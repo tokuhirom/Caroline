@@ -186,7 +186,7 @@ sub edit {
         my $c = ReadKey(0) or return $state->buf;
         my $cc = ord($c);
 
-        if ($cc == 9 && defined $self->{completion_callback}) {
+        if ($cc == TAB && defined $self->{completion_callback}) {
             $c = $self->complete_line($state);
             return undef unless defined $c;
             $cc = ord($c);
@@ -464,6 +464,7 @@ sub refresh_multi_line {
     my ($self, $state) = @_;
 
     my $plen = vwidth($state->prompt);
+    $self->debug($state->buf.  "\n");
 
     # rows used by current buf
     my $rows = int(($plen + vwidth($state->buf) + $state->cols -1) / $state->cols);
