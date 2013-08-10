@@ -21,6 +21,30 @@ use Class::Accessor::Lite 0.05 (
     rw => [qw(completion_callback history_max_len)],
 );
 
+use constant {
+    CTRL_A => 1,
+    CTRL_B => 2,
+    CTRL_C => 3,
+    CTRL_D => 4,
+    CTRL_E => 5,
+    CTRL_F => 6,
+    CTRL_H => 8,
+    CTRL_I => 9,
+    CTRL_K => 11,
+    CTRL_L => 12,
+    CTRL_M => 13,
+    CTRL_N => 14,
+    CTRL_P => 16,
+    CTRL_R => 18,
+    CTRL_T => 20,
+    CTRL_U => 21,
+    CTRL_W => 23,
+    BACKSPACE => 127,
+    ENTER => 13,
+    TAB => 9,
+    ESC => 27,
+};
+
 sub new {
     my $class = shift;
     my %args = @_==1? %{$_[0]} : @_;
@@ -169,20 +193,20 @@ sub edit {
             next if $cc == 0;
         }
 
-        if ($cc == 13) { # enter
+        if ($cc == ENTER) { # enter
             pop @{$self->{history}};
             return $state->buf;
-        } elsif ($cc==3) { # ctrl-c
+        } elsif ($cc==CTRL_C) { # ctrl-c
             return undef;
-        } elsif ($cc == 127 || $cc == 8) { # backspace or ctrl-h
+        } elsif ($cc == BACKSPACE || $cc == CTRL_H) { # backspace or ctrl-h
             $self->edit_backspace($state);
-        } elsif ($cc == 4) { # ctrl-d
+        } elsif ($cc == CTRL_D) { # ctrl-d
             if (length($state->buf) > 0) {
                 $self->edit_delete($state);
             } else {
                 return undef;
             }
-        } elsif ($cc == 20) { # ctrl-t
+        } elsif ($cc == CTRL_T) { # ctrl-t
             # swaps current character with prvious
             if ($state->pos > 0 && $state->pos < $state->len) {
                 my $aux = substr($state->buf, $state->pos-1, 1);
@@ -193,13 +217,13 @@ sub edit {
                 }
             }
             $self->refresh_line($state);
-        } elsif ($cc == 2) { # ctrl-b
+        } elsif ($cc == CTRL_B) { # ctrl-b
             $self->edit_move_left($state);
-        } elsif ($cc == 6) { # ctrl-f
+        } elsif ($cc == CTRL_F) { # ctrl-f
             $self->edit_move_right($state);
-        } elsif ($cc == 16) { # ctrl-p
+        } elsif ($cc == CTRL_P) { # ctrl-p
             $self->edit_history_next($state, $HISTORY_PREV);
-        } elsif ($cc == 14) { # ctrl-n
+        } elsif ($cc == CTRL_N) { # ctrl-n
             $self->edit_history_next($state, $HISTORY_NEXT);
         } elsif ($cc == 27) { # escape sequence
             next if $IS_WIN32;
@@ -223,24 +247,26 @@ sub edit {
 #                   linenoiseEditDelete(&l);
 #               }
 #           }
-        } elsif ($cc == 21) { # ctrl-u
+        } elsif ($cc == CTRL_U) { # ctrl-u
             # delete the whole line.
             $state->{buf} = '';
             $state->{pos} = 0;
             $self->refresh_line($state);
-        } elsif ($cc == 11) { # ctrl-k
+        } elsif ($cc == CTRL_K) { # ctrl-k
             substr($state->{buf}, $state->{pos}) = '';
             $self->refresh_line($state);
-        } elsif ($cc == 1) { # ctrl-a
+        } elsif ($cc == CTRL_A) { # ctrl-a
             $state->{pos} = 0;
             $self->refresh_line($state);
-        } elsif ($cc == 5) { # ctrl-e
+        } elsif ($cc == CTRL_E) { # ctrl-e
             $state->{pos} = length($state->buf);
             $self->refresh_line($state);
-        } elsif ($cc == 12) { # ctrl-l
+        } elsif ($cc == CTRL_L) { # ctrl-l
             $self->clear_screen();
             $self->refresh_line($state);
-        } elsif ($cc == 23) { # ctrl-w
+        } elsif ($cc == CTRL_R) { # ctrl-r
+            $self->search($state);
+        } elsif ($cc == CTRL_W) { # ctrl-w
             $self->edit_delete_prev_word($state);
         } else {
             $self->edit_insert($state, $c);
@@ -282,6 +308,45 @@ sub edit_delete {
     }
 }
 
+sub search {
+    my ($self, $state) = @_;
+
+    my $query = '';
+    while (1) {
+        my $c = ReadKey(0) or return undef;
+        my $cc = ord($c);
+
+        if (
+            $cc == CTRL_B
+            || $cc == CTRL_C
+            || $cc == CTRL_F
+            || $cc == ENTER
+        ) {
+            $state->query('');
+            return;
+        }
+        if ($cc == BACKSPACE || $cc == CTRL_H) {
+            $query =~ s/.\z//;
+            next;
+        }
+        $self->debug("C: $cc\n");
+
+        $query .= $c;
+        $state->query($query);
+        $self->debug("Searching '$query'\n");
+        SEARCH:
+        for my $hist (@{$self->history}) {
+            if ((my $idx = index($hist, $query)) >= 0) {
+                $state->buf($hist);
+                $state->pos($idx);
+                $self->refresh_line($state);
+                last SEARCH;
+            }
+        }
+        $self->beep();
+    }
+}
+
 sub complete_line {
     my ($self, $state) = @_;
 
@@ -305,12 +370,12 @@ sub complete_line {
 
         my $c = ReadKey(0) or return undef;
         my $cc = ord($c);
-        if ($cc == 9) { # tab
+        if ($cc == TAB) { # tab
             $i = ($i+1) % (1+@ret);
             if ($i==@ret) {
                 $self->beep();
             }
-        } elsif ($cc == 27) { # escape
+        } elsif ($cc == ESC) { # escape
             # Re-show original buffer
             if ($i<@ret) {
                 $self->refresh_line($state);
@@ -328,6 +393,8 @@ sub complete_line {
 }
 
 sub beep {
+    my $self = shift;
+    $self->debug("Beep!\n");
     print STDERR "\x7";
     STDERR->flush;
 }
@@ -542,7 +609,7 @@ sub is_supported {
 package Caroline::State;
 
 use Class::Accessor::Lite 0.05 (
-    rw => [qw(buf pos cols prompt oldpos maxrows)],
+    rw => [qw(buf pos cols prompt oldpos maxrows query)],
 );
 
 sub new {
@@ -692,14 +759,6 @@ Copyright (C) tokuhirom.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
-
-=head1 TODO
-
-=over 4
-
-=item Search with C-r
-
-=back
 
 =head1 SEE ALSO
 
