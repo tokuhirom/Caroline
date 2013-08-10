@@ -290,6 +290,8 @@ sub read_history_file {
 sub write_history_file {
     my ($self, $filename) = @_;
 
+    return undef if $self->history_max_len == 0;
+
     open my $fh, '>:encoding(utf-8)', $filename
         or return undef;
     for my $hist (@{$self->history}) {
