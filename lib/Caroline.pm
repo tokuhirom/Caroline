@@ -314,6 +314,8 @@ sub search {
     my ($self, $state) = @_;
 
     my $query = '';
+    local $state->{query} = '';
+    LOOP:
     while (1) {
         my $c = ReadKey(0) or return undef;
         my $cc = ord($c);
@@ -324,16 +326,16 @@ sub search {
             || $cc == CTRL_F
             || $cc == ENTER
         ) {
-            $state->query('');
             return;
         }
         if ($cc == BACKSPACE || $cc == CTRL_H) {
+            $self->debug("ctrl-h in searching\n");
             $query =~ s/.\z//;
-            next;
+        } else {
+            $query .= $c;
         }
         $self->debug("C: $cc\n");
 
-        $query .= $c;
         $state->query($query);
         $self->debug("Searching '$query'\n");
         SEARCH:
@@ -342,10 +344,11 @@ sub search {
                 $state->buf($hist);
                 $state->pos($idx);
                 $self->refresh_line($state);
-                last SEARCH;
+                next LOOP;
             }
         }
         $self->beep();
+        $self->refresh_line($state);
     }
 }
 
@@ -464,6 +467,10 @@ sub refresh_multi_line {
 
     # rows used by current buf
     my $rows = int(($plen + vwidth($state->buf) + $state->cols -1) / $state->cols);
+    if (defined $state->query) {
+        $rows++;
+    }
+
     # cursor relative row
     my $rpos = int(($plen + $state->oldpos + $state->cols) / $state->cols);
 
@@ -497,6 +504,9 @@ sub refresh_multi_line {
     # Write the prompt and the current buffer content
     print $state->prompt;
     print $state->buf;
+    if (defined $state->query) {
+        print "\015\nSearch: " . $state->query;
+    }
 
     # If we are at the very end of the screen with our prompt, we need to
     # emit a newline and move the prompt to the first column
