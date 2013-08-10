@@ -21,6 +21,12 @@ This module supports
 
 - History handling
 - Complition
+- Portable
+- No C library dependency
+
+# PROJECT GOALS
+
+Provides portable line editing library for Perl5 community.
 
 # METHODS
 
@@ -87,7 +93,6 @@ it under the same terms as Perl itself.
 
 # TODO
 
-- Win32 Support
 - Search with C-r
 
 # SEE ALSO

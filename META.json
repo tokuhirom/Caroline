@@ -68,5 +68,8 @@
          "web" : "https://github.com/tokuhirom/Caroline"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04",
+   "x_contributors" : [
+      "mattn <mattn.jp@gmail.com>"
+   ]
 }
