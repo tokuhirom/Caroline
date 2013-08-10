@@ -75,6 +75,14 @@ Provides portable line editing library for Perl5 community.
 
     Get the current history data in ` ArrayRef[Str] `.
 
+- $caroline->write\_history\_file($filename)
+
+    Write history data to the file.
+
+- $caroline->read\_history\_file($filename)
+
+    Read history data from history file.
+
 # Multi byte character support
 
 If you want to support multi byte characters, you need to set binmode to STDIN.
@@ -102,3 +110,5 @@ it under the same terms as Perl itself.
 # AUTHOR
 
 tokuhirom <tokuhirom@gmail.com>
+
+mattn

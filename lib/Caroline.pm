@@ -7,7 +7,7 @@ use Storable;
 use Text::VisualWidth::PP 0.03 qw(vwidth);
 use Term::ReadKey qw(GetTerminalSize ReadLine ReadKey ReadMode);
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 our @EXPORT = qw( caroline );
 
@@ -673,7 +673,7 @@ Write history data to the file.
 
 =item $caroline->read_history_file($filename)
 
-Read history data from hisotry file.
+Read history data from history file.
 
 =back
 
@@ -708,6 +708,8 @@ L<https://github.com/antirez/linenoise/blob/master/linenoise.c>
 =head1 AUTHOR
 
 tokuhirom E<lt>tokuhirom@gmail.comE<gt>
+
+mattn
 
 =cut
 
