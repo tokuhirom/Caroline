@@ -122,6 +122,7 @@ Term::ReadLine::Caroline - Term::ReadLine style wrapper for Caroline
 
 Term::ReadLine::Caroline provides L<Term::ReadLine> interface using L<Caroline>.
 
+You can use Caroline with this wrapper module, but I *recommend* to use L<Caroline> directly.
 
 =head1 AUTHOR
 

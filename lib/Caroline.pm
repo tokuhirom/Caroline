@@ -579,7 +579,15 @@ This module supports
 
 =item Complition
 
+=item Portable
+
+=item No C library dependency
+
 =back
+
+=head1 PROJECT GOALS
+
+Provides portable line editing library for Perl5 community.
 
 =head1 METHODS
 
@@ -655,8 +663,6 @@ it under the same terms as Perl itself.
 =head1 TODO
 
 =over 4
-
-=item Win32 Support
 
 =item Search with C-r
 
