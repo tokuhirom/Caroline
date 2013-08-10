@@ -99,10 +99,6 @@ Copyright (C) tokuhirom.
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-# TODO
-
-- Search with C-r
-
 # SEE ALSO
 
 [https://github.com/antirez/linenoise/blob/master/linenoise.c](https://github.com/antirez/linenoise/blob/master/linenoise.c)

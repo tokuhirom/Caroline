@@ -2,6 +2,11 @@ Revision history for Perl extension Caroline
 
 {{$NEXT}}
 
+0.06 2013-08-10T04:05:43Z
+
+    - Do not create history file if maximum history length was limited to 0.
+      (tokuhirom)
+
 0.05 2013-08-10T02:36:23Z
 
     - write_history_file, read_history_file.
