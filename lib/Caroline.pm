@@ -249,6 +249,31 @@ sub edit {
     return $state->buf;
 }
 
+sub read_history_file {
+    my ($self, $filename) = @_;
+    open my $fh, '<:encoding(utf-8)', $filename
+        or return undef;
+    while (my $hist = <$fh>) {
+        chomp($hist);
+        $self->history_add($hist);
+    }
+    close $fh;
+    return 1;
+}
+
+sub write_history_file {
+    my ($self, $filename) = @_;
+
+    open my $fh, '>:encoding(utf-8)', $filename
+        or return undef;
+    for my $hist (@{$self->history}) {
+        next unless $hist =~ /\S/;
+        print $fh $hist . "\n";
+    }
+    close $fh;
+    return 1;
+}
+
 sub edit_delete {
     my ($self, $status) = @_;
     if ($status->len > 0 && $status->pos < $status->len) {
@@ -641,6 +666,14 @@ Add $line to the history.
 =item $caroline->history()
 
 Get the current history data in C< ArrayRef[Str] >.
+
+=item $caroline->write_history_file($filename)
+
+Write history data to the file.
+
+=item $caroline->read_history_file($filename)
+
+Read history data from hisotry file.
 
 =back
 
