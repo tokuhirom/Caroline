@@ -183,7 +183,10 @@ sub edit {
     $self->debug("Columns: $state->{cols}\n");
 
     while (1) {
-        my $c = ReadKey(0) or return $state->buf;
+        my $c = ReadKey(0);
+        unless (defined $c) {
+            return $state->buf;
+        }
         my $cc = ord($c);
 
         if ($cc == TAB && defined $self->{completion_callback}) {
