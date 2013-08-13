@@ -47,3 +47,4 @@ while (defined(my $line = $c->readline('hello> '))) {
 END {
     $c->write_history_file($history_file_name);
 }
+print "Bye...\n";

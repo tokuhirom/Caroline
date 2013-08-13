@@ -133,6 +133,7 @@ sub readkey {
 sub read_raw {
     my ($self, $prompt) = @_;
 
+    local $self->{sigint};
     my $ret;
     {
         $self->enable_raw_mode();
@@ -141,6 +142,9 @@ sub read_raw {
     }
     print STDOUT "\n";
     STDOUT->flush;
+    if ($self->{sigint}) {
+        kill 'INT', $$;
+    }
     return $ret;
 }
 
@@ -223,6 +227,7 @@ sub edit {
             pop @{$self->{history}};
             return $state->buf;
         } elsif ($cc==CTRL_C) { # ctrl-c
+            $self->{sigint}++;
             return undef;
         } elsif ($cc == BACKSPACE || $cc == CTRL_H) { # backspace or ctrl-h
             $self->edit_backspace($state);
