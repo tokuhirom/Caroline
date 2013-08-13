@@ -348,7 +348,7 @@ sub search {
         unless (defined $c) {
             return $state->buf;
         }
-        my $cc = ord($c);
+        my $cc = ord($c) or next;
 
         if (
             $cc == CTRL_B
