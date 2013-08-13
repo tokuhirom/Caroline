@@ -2,6 +2,11 @@ Revision history for Perl extension Caroline
 
 {{$NEXT}}
 
+0.11 2013-08-13T04:18:39Z
+
+    - Added Term::ReadLine::Caroline#StifleHistory for reply.
+      (tokuhirom)
+
 0.10 2013-08-13T04:06:55Z
 
     - Fixes allow key handling on windows
