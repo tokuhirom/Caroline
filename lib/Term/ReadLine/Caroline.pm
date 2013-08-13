@@ -3,7 +3,8 @@ use strict;
 use warnings;
 use utf8;
 use 5.008_001;
-use parent qw(Term::ReadLine::Stub);
+
+our @ISA = qw(Term::ReadLine::Stub);
 
 use Caroline;
 
