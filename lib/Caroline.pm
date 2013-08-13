@@ -106,6 +106,29 @@ sub get_columns {
     return $wchar;
 }
 
+sub readkey {
+    my $self = shift;
+    my $c = ReadKey(0);
+    return undef unless defined $c;
+    return $c unless $IS_WIN32;
+
+    # Win32 API always return the bytes encoded with ACP. So it must be
+    # decoded from double byte sequence. To detect double byte sequence, it
+    # use Win32 API IsDBCSLeadByte.
+    require Win32::API;
+    require Encode;
+    require Term::Encoding;
+    $self->{isleadbyte} ||= Win32::API->new(
+      'kernel32', 'int IsDBCSLeadByte(char a)',
+    );
+    $self->{encoding} ||= Term::Encoding::get_encoding();
+    if ($self->{isleadbyte}->Call($c)) {
+        $c .= ReadKey(0);
+        $c = Encode::decode($self->{encoding}, $c);
+    }
+    $c;
+}
+
 # linenoiseRaw
 sub read_raw {
     my ($self, $prompt) = @_;
@@ -183,11 +206,11 @@ sub edit {
     $self->debug("Columns: $state->{cols}\n");
 
     while (1) {
-        my $c = ReadKey(0);
+        my $c = $self->readkey;
         unless (defined $c) {
             return $state->buf;
         }
-        my $cc = ord($c);
+        my $cc = ord($c) or next;
 
         if ($cc == TAB && defined $self->{completion_callback}) {
             $c = $self->complete_line($state);
@@ -321,7 +344,10 @@ sub search {
     local $state->{query} = '';
     LOOP:
     while (1) {
-        my $c = ReadKey(0) or return undef;
+        my $c = $self->readkey;
+        unless (defined $c) {
+            return $state->buf;
+        }
         my $cc = ord($c);
 
         if (
@@ -377,8 +403,12 @@ sub complete_line {
             $self->refresh_line($state);
         }
 
-        my $c = ReadKey(0) or return undef;
-        my $cc = ord($c);
+        my $c = $self->readkey;
+        unless (defined $c) {
+            return undef;
+        }
+        my $cc = ord($c) or next;
+
         if ($cc == TAB) { # tab
             $i = ($i+1) % (1+@ret);
             if ($i==@ret) {
