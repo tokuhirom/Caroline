@@ -263,6 +263,18 @@ sub edit {
                 $self->edit_history_next($state, $HISTORY_PREV);
             } elsif ($buf eq "[B") { # down arrow
                 $self->edit_history_next($state, $HISTORY_NEXT);
+            } elsif ($buf eq "[1") { # home
+                $buf = $self->readkey or return undef;
+                if ($buf eq '~') {
+                    $state->{pos} = 0;
+                    $self->refresh_line($state);
+                }
+            } elsif ($buf eq "[4") { # end
+                $buf = $self->readkey or return undef;
+                if ($buf eq '~') {
+                    $state->{pos} = length($state->buf);
+                    $self->refresh_line($state);
+                }
             }
             # TODO:
 #           else if (seq[0] == 91 && seq[1] > 48 && seq[1] < 55) {
