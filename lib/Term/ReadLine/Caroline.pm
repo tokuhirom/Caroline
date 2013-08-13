@@ -42,9 +42,13 @@ sub StifleHistory {
 }
 
 sub addhistory {
-    my ($self, $entry) = @_;
-    $self->caroline->history_add($entry);
+    my $self = shift;
+    for my $entry (@_) {
+        $self->caroline->history_add($entry);
+    }
 }
+sub AddHistory { shift->addhistory(@_) }
+sub GetHistory { shift->{history} }
 
 sub IN { shift->{IN} }
 sub OUT { shift->{OUT} }
@@ -89,11 +93,17 @@ sub findConsole {
     ($console,$consoleOUT);
 }
 
+our %Features = (
+    addHistory => 1,
+    getHistory => 1,
+);
 
 sub Attribs { shift->{Attribs} }
 
-sub Features {
-    +{ }
+sub Features { \%Features }
+
+sub ornaments {
+    # NIY
 }
 
 1;
