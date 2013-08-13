@@ -33,14 +33,12 @@ sub readline {
 
 sub WriteHistory {
     my ($self, $filename) = @_;
+    $self->caroline->write_history_file($filename);
+}
 
-    open my $fh, '>:utf8', $filename
-        or die "Cannot open '$filename' for writing: $!";
-    for my $hist (@{$self->caroline->history}) {
-        next unless $hist =~ /\S/;
-        print $fh $hist . "\n";
-    }
-    close $fh;
+sub StifleHistory {
+    my ($self, $limit) = @_;
+    $self->caroline->history_max_len($limit);
 }
 
 sub addhistory {
