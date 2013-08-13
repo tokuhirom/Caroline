@@ -69,9 +69,9 @@
          "web" : "https://github.com/tokuhirom/Caroline"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_contributors" : [
-      "mattn <mattn.jp@gmail.com>",
-      "Ahmad M. Zawawi <ahmad.zawawi@gmail.com>"
+      "Ahmad M. Zawawi <ahmad.zawawi@gmail.com>",
+      "mattn <mattn.jp@gmail.com>"
    ]
 }
