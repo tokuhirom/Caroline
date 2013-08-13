@@ -4,6 +4,12 @@ requires 'POSIX';
 requires 'Text::VisualWidth::PP', 0.03;
 requires 'Class::Accessor::Lite', 0.05;
 requires 'Term::ReadKey', 2.30;
+if ($^O eq 'MSWin32') {
+    require Win32::API;
+    require Encode;
+    require Term::Encoding;
+    require Win32::Console::ANSI;
+}
 
 on 'test' => sub {
     requires 'Test::More', '0.98';
