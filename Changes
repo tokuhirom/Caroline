@@ -2,6 +2,10 @@ Revision history for Perl extension Caroline
 
 {{$NEXT}}
 
+0.15 2013-08-14T03:07:05Z
+
+    - fixed deps for CPANTS
+
 0.14 2013-08-13T05:50:07Z
 
     - Send SIGKILL to the process itself when got C-c.
