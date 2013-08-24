@@ -6,6 +6,7 @@ use POSIX qw(termios_h);
 use Storable;
 use Text::VisualWidth::PP 0.03 qw(vwidth);
 use Term::ReadKey qw(GetTerminalSize ReadLine ReadKey ReadMode);
+use IO::Handle;
 
 our $VERSION = "0.15";
 
