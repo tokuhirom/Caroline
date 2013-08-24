@@ -2,6 +2,11 @@ Revision history for Perl extension Caroline
 
 {{$NEXT}}
 
+0.16 2013-08-24T08:28:22Z
+
+    - Load IO::Handle to call STDOUT->autoflush.
+      (Reported by KamunagiChiduru++)
+
 0.15 2013-08-14T03:07:05Z
 
     - fixed deps for CPANTS
