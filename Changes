@@ -2,6 +2,12 @@ Revision history for Perl extension Caroline
 
 {{$NEXT}}
 
+0.17 2013-09-09T07:37:23Z
+
+    - Detect ambw's width by Unicode::EastAsianWidth::Detect.
+      https://github.com/tokuhirom/Caroline/issues/9
+      (Reported by disarmer++, implemented by mattn++)
+
 0.16 2013-08-24T08:28:22Z
 
     - Load IO::Handle to call STDOUT->autoflush.

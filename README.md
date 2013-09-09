@@ -93,6 +93,12 @@ You can add the following code before call Caroline.
     my $encoding = term_encoding();
     binmode *STDIN, ":encoding(${encoding})";
 
+# About east Asian ambiguous width characters
+
+Caroline detects east Asian ambiguous character width from environment variable using [Unicode::EastAsianWidth::Detect](http://search.cpan.org/perldoc?Unicode::EastAsianWidth::Detect).
+
+User need to set locale correctly. For more details, please read [Unicode::EastAsianWidth::Detect](http://search.cpan.org/perldoc?Unicode::EastAsianWidth::Detect).
+
 # LICENSE
 
 Copyright (C) tokuhirom.
