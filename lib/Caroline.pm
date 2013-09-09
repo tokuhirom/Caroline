@@ -5,6 +5,7 @@ use warnings;
 use POSIX qw(termios_h);
 use Storable;
 use Text::VisualWidth::PP 0.03 qw(vwidth);
+use Unicode::EastAsianWidth::Detect qw(is_cjk_lang);
 use Term::ReadKey qw(GetTerminalSize ReadLine ReadKey ReadMode);
 use IO::Handle;
 
@@ -87,7 +88,7 @@ sub readline {
     $prompt = '> ' unless defined $prompt;
     STDOUT->autoflush(1);
 
-    local $Text::VisualWidth::PP::EastAsian = 1;
+    local $Text::VisualWidth::PP::EastAsian = is_cjk_lang;
 
     if ($self->is_supported && -t STDIN) {
         return $self->read_raw($prompt);
