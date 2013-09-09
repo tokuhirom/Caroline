@@ -2,6 +2,10 @@ Revision history for Perl extension Caroline
 
 {{$NEXT}}
 
+0.18 2013-09-09T08:01:38Z
+
+    - Fxied deps for MSWin32
+
 0.17 2013-09-09T07:37:23Z
 
     - Detect ambw's width by Unicode::EastAsianWidth::Detect.

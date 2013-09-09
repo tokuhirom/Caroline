@@ -9,7 +9,7 @@ use Unicode::EastAsianWidth::Detect qw(is_cjk_lang);
 use Term::ReadKey qw(GetTerminalSize ReadLine ReadKey ReadMode);
 use IO::Handle;
 
-our $VERSION = "0.17";
+our $VERSION = "0.18";
 
 our @EXPORT = qw( caroline );
 
