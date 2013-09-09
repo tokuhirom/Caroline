@@ -817,6 +817,12 @@ You can add the following code before call Caroline.
     my $encoding = term_encoding();
     binmode *STDIN, ":encoding(${encoding})";
 
+=head1 About east Asian ambigious width characters
+
+Caroline detects east asian ambigious character width from environment variable using L<Unicode::EastAsianWidth::Detect>.
+
+User need to set locale correctly. For more details, please read L<Unicode::EastAsianWidth::Detect>.
+
 =head1 LICENSE
 
 Copyright (C) tokuhirom.
