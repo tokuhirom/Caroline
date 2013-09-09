@@ -9,10 +9,11 @@ requires 'Unicode::EastAsianWidth::Detect', '0.03';
 recommends 'Term::ReadLine';
 
 if ($^O eq 'MSWin32') {
-    require Win32::API;
-    require Encode;
-    require Term::Encoding;
-    require Win32::Console::ANSI;
+    requires 'Win32::API';
+    requires 'Encode';
+    requires 'Term::Encoding';
+    requires 'Win32::Console::ANSI';
+    requires 'Term::Encoding';
 }
 
 on 'test' => sub {
