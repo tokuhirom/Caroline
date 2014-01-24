@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use utf8;
 use 5.008_001;
+use Term::Encoding qw/term_encoding/;
 
 our @ISA = qw(Term::ReadLine::Stub);
 
@@ -12,6 +13,12 @@ sub ReadLine { __PACKAGE__ }
 
 sub new {
     my $class = shift;
+
+    # Support multi byte characters
+    my $encoding = term_encoding();
+    binmode *STDIN,  ":encoding(${encoding})";
+    binmode *STDOUT, ":encoding(${encoding})";
+
     my $self = bless {
         caroline => Caroline->new(),
         IN => *STDIN,
