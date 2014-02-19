@@ -2,6 +2,14 @@ Revision history for Perl extension Caroline
 
 {{$NEXT}}
 
+0.19 2014-02-19T07:32:35Z
+
+    commit 7564b30e50a30b233bac6614e97b7fbcf6ac4e0b
+    Author: moznion <moznion@gmail.com>
+    Date:   Thu Jan 23 19:12:52 2014 +0900
+
+    Support multi byte characters as default on Term::Readline::Caroline
+
 0.18 2013-09-09T08:01:38Z
 
     - Fxied deps for MSWin32

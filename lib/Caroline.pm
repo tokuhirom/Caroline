@@ -9,7 +9,7 @@ use Unicode::EastAsianWidth::Detect qw(is_cjk_lang);
 use Term::ReadKey qw(GetTerminalSize ReadLine ReadKey ReadMode);
 use IO::Handle;
 
-our $VERSION = "0.18";
+our $VERSION = "0.19";
 
 our @EXPORT = qw( caroline );
 
@@ -784,25 +784,25 @@ You can write completion callback function like this:
 
 =back
 
-=item my $line = $caroline->read($prompt);
+=item C<< my $line = $caroline->read($prompt); >>
 
 Read line with C<$prompt>.
 
 Trailing newline is removed. Returns undef on EOF.
 
-=item $caroline->history_add($line)
+=item C<< $caroline->history_add($line) >> 
 
 Add $line to the history.
 
-=item $caroline->history()
+=item C<< $caroline->history() >>
 
 Get the current history data in C< ArrayRef[Str] >.
 
-=item $caroline->write_history_file($filename)
+=item C<< $caroline->write_history_file($filename) >>
 
 Write history data to the file.
 
-=item $caroline->read_history_file($filename)
+=item C<< $caroline->read_history_file($filename) >>
 
 Read history data from history file.
 

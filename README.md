@@ -15,7 +15,7 @@ Caroline - Yet another line editing library
 
 # DESCRIPTION
 
-Caroline is yet another line editing library like [Term::ReadLine::Gnu](http://search.cpan.org/perldoc?Term::ReadLine::Gnu).
+Caroline is yet another line editing library like [Term::ReadLine::Gnu](https://metacpan.org/pod/Term::ReadLine::Gnu).
 
 This module supports
 
@@ -62,25 +62,25 @@ Provides portable line editing library for Perl5 community.
                 },
             );
 
-- my $line = $caroline->read($prompt);
+- `my $line = $caroline->read($prompt);`
 
     Read line with `$prompt`.
 
     Trailing newline is removed. Returns undef on EOF.
 
-- $caroline->history\_add($line)
+- `$caroline->history_add($line)` 
 
     Add $line to the history.
 
-- $caroline->history()
+- `$caroline->history()`
 
     Get the current history data in ` ArrayRef[Str] `.
 
-- $caroline->write\_history\_file($filename)
+- `$caroline->write_history_file($filename)`
 
     Write history data to the file.
 
-- $caroline->read\_history\_file($filename)
+- `$caroline->read_history_file($filename)`
 
     Read history data from history file.
 
@@ -95,9 +95,9 @@ You can add the following code before call Caroline.
 
 # About east Asian ambiguous width characters
 
-Caroline detects east Asian ambiguous character width from environment variable using [Unicode::EastAsianWidth::Detect](http://search.cpan.org/perldoc?Unicode::EastAsianWidth::Detect).
+Caroline detects east Asian ambiguous character width from environment variable using [Unicode::EastAsianWidth::Detect](https://metacpan.org/pod/Unicode::EastAsianWidth::Detect).
 
-User need to set locale correctly. For more details, please read [Unicode::EastAsianWidth::Detect](http://search.cpan.org/perldoc?Unicode::EastAsianWidth::Detect).
+User need to set locale correctly. For more details, please read [Unicode::EastAsianWidth::Detect](https://metacpan.org/pod/Unicode::EastAsianWidth::Detect).
 
 # LICENSE
 
