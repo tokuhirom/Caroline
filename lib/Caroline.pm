@@ -41,6 +41,7 @@ use constant {
     CTRL_T => 20,
     CTRL_U => 21,
     CTRL_W => 23,
+    CTRL_Z => 26,
     BACKSPACE => 127,
     ENTER => 13,
     TAB => 9,
@@ -136,6 +137,7 @@ sub read_raw {
     my ($self, $prompt) = @_;
 
     local $self->{sigint};
+    local $self->{sigtstp};
     my $ret;
     {
         $self->enable_raw_mode();
@@ -146,6 +148,8 @@ sub read_raw {
     STDOUT->flush;
     if ($self->{sigint}) {
         kill 'INT', $$;
+    } elsif ($self->{sigtstp}) {
+        kill 'TSTP', $$;
     }
     return $ret;
 }
@@ -231,6 +235,9 @@ sub edit {
         } elsif ($cc==CTRL_C) { # ctrl-c
             $self->{sigint}++;
             return undef;
+        } elsif ($cc==CTRL_Z) { # ctrl-z
+            $self->{sigtstp}++;
+            return $state->buf;
         } elsif ($cc == BACKSPACE || $cc == CTRL_H) { # backspace or ctrl-h
             $self->edit_backspace($state);
         } elsif ($cc == CTRL_D) { # ctrl-d
