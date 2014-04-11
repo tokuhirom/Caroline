@@ -149,7 +149,7 @@ sub read_raw {
     if ($self->{sigint}) {
         kill 'INT', $$;
     } elsif ($self->{sigtstp}) {
-        kill 'TSTP', $$;
+        kill $IS_WIN32 ? 'INT' : 'TSTP', $$;
     }
     return $ret;
 }
