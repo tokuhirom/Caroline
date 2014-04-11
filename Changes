@@ -2,6 +2,11 @@ Revision history for Perl extension Caroline
 
 {{$NEXT}}
 
+0.20 2014-04-11T05:18:39Z
+
+    - C-z -> sigtstp
+      (yoshidaster)
+
 0.19 2014-02-19T07:32:35Z
 
     commit 7564b30e50a30b233bac6614e97b7fbcf6ac4e0b
