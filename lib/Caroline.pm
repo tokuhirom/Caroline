@@ -721,6 +721,11 @@ Caroline - Yet another line editing library
 =head1 SYNOPSIS
 
     use Caroline;
+    use Term::Encoding qw(term_encoding);
+
+    my $encoding = term_encoding();
+    binmode *STDIN, ":encoding(${encoding})";
+    binmode *STDOUT, ":encoding(${encoding})";
 
     my $c = Caroline->new;
     while (defined(my $line = $c->readline('> '))) {
