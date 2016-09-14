@@ -412,7 +412,7 @@ sub search {
 sub complete_line {
     my ($self, $state) = @_;
 
-    my @ret = grep { defined $_ } $self->{completion_callback}->($state->buf);
+    my @ret = grep { defined $_ } $self->{completion_callback}->($state->buf, $state->pos);
     unless (@ret) {
         $self->beep;
         return "\0";
@@ -424,7 +424,7 @@ sub complete_line {
         if ($i < @ret) {
             my $cloned = Storable::dclone($state);
             $cloned->{buf} = $ret[$i];
-            $cloned->{pos} = length($cloned->{buf});
+            $cloned->{pos} = $state->pos + length($cloned->{buf}) - length($state->buf);
             $self->refresh_line($cloned);
         } else {
             $self->refresh_line($state);
@@ -450,8 +450,8 @@ sub complete_line {
         } else {
             # Update buffer and return
             if ($i<@ret) {
+                $state->{pos} = $state->{pos} + length($ret[$i]) - length($state->{buf});
                 $state->{buf} = $ret[$i];
-                $state->{pos} = length($state->{buf});
             }
             return $c;
         }
