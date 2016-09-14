@@ -2,6 +2,20 @@ Revision history for Perl extension Caroline
 
 {{$NEXT}}
 
+0.22 2016-09-14T04:20:29Z
+
+    commit 9d3104bdce9fa9659f3b19fc44a140883af8e45d
+    Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
+    Date:   Wed Sep 14 11:27:00 2016 +0900
+
+        handle partial input
+
+    commit 1bcbf775a71542c11f5b7a9df7ea9c18a1a87504
+    Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
+    Date:   Wed Sep 14 11:26:32 2016 +0900
+
+        pass $state->pos to be possible to handle partial input
+
 0.21 2014-07-19T23:09:14Z
 
     - Switch to MBTiny
