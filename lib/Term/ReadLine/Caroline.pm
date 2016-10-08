@@ -5,6 +5,7 @@ use utf8;
 use 5.008_001;
 use Term::Encoding qw/term_encoding/;
 
+use Term::ReadLine;
 our @ISA = qw(Term::ReadLine::Stub);
 
 use Caroline;
